@@ -1,0 +1,28 @@
+{
+  "name": "skinverdict",
+  "version": "3.0.0",
+  "description": "SkinVerdict: should I buy this, and is it working? Skin-aware product decisions powered by the YouCam AI Skin Analysis API.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js --pretty",
+    "https": "node server.js --https --pretty",
+    "test": "node test/engine.test.js && node test/server.test.js",
+    "test:api": "node scripts/test-api.js",
+    "mock": "node test/mock-youcam.js",
+    "export-rules": "node scripts/export-rules.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.21",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "selfsigned": "^2.4.1",
+    "tesseract.js": "^5.1.1"
+  }
+}

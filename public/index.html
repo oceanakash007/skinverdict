@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SkinVerdict: should I buy this, and is it working?</title>
+  <meta name="description" content="Scan your skin with YouCam AI, check any product's ingredients against your own results, and track whether it's actually working." />
+  <meta name="theme-color" content="#2f5d4a" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121815" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="SkinVerdict" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=5" />
+  <script src="js/theme.js?v=5"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div class="brand"><span class="dot" aria-hidden="true"></span>SkinVerdict</div>
+      <nav class="steps" id="steps" aria-label="Main">
+        <button data-go="scan" aria-current="page"><b aria-hidden="true">1</b> Scan</button>
+        <button data-go="results"><b aria-hidden="true">2</b> Report</button>
+        <button data-go="decide"><b aria-hidden="true">3</b> Buy it?</button>
+        <button data-go="track"><b aria-hidden="true">4</b> Working?</button>
+      </nav>
+      <button class="icon-btn" id="theme-toggle" aria-label="Switch to dark mode" title="Toggle dark mode">☾</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" tabindex="-1">
+    <div class="banner" id="key-banner" role="alert" hidden></div>
+
+    <!-- ============ 1. SCAN (landing) ============ -->
+    <section id="view-scan" class="view landing" aria-labelledby="scan-h">
+      <div class="blob" aria-hidden="true"></div>
+      <div class="landing-inner">
+        <span class="kicker" id="mode-note">AI skin scan · 10 seconds</span>
+        <h1 id="scan-h" tabindex="-1">Skin<span class="grad">Verdict</span></h1>
+        <p class="tagline">Know your skin. Buy what works. Ditch what doesn't.</p>
+        <button class="btn primary xl" id="btn-camera"><span aria-hidden="true">✨</span> Start face scan</button>
+        <div class="alt-actions">
+          <button class="linkish" id="btn-sample">Try a sample scan</button>
+          <span aria-hidden="true">·</span>
+          <button class="linkish" id="btn-upload">Upload a photo</button>
+        </div>
+        <ul class="howto" aria-label="Before you scan">
+          <li><span aria-hidden="true">💡</span> Bright light</li>
+          <li><span aria-hidden="true">👓</span> No glasses</li>
+          <li><span aria-hidden="true">🙆</span> Hair off forehead</li>
+        </ul>
+        <p class="tiny">Look straight → turn left → turn right. Your photo is never stored.</p>
+        <button class="linkish small" id="btn-last" hidden>See your last report →</button>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden aria-hidden="true" tabindex="-1" />
+      <input type="file" id="file-cam" accept="image/*" capture="user" hidden aria-hidden="true" tabindex="-1" />
+      <div class="error card" id="scan-error" role="alert" hidden></div>
+    </section>
+
+    <!-- Review overlay: photo check before spending a unit, then the analyzing animation -->
+    <div class="review" id="review" role="dialog" aria-modal="true" aria-labelledby="review-h" hidden>
+      <div class="review-card">
+        <button class="sc-close review-close" id="btn-review-close" aria-label="Close">✕</button>
+        <div class="review-photo">
+          <img id="preview-img" alt="Your photo, ready to analyze" />
+          <div class="analyzing-fx" aria-hidden="true"></div>
+        </div>
+        <div class="angles" id="angles"></div>
+        <div id="review-ready">
+          <h2 id="review-h">Looking good?</h2>
+          <ul class="checks" id="checks" aria-label="Photo quality checks"></ul>
+          <div class="actions tight">
+            <button class="btn primary" id="btn-analyze">Analyze my skin</button>
+            <button class="btn ghost" id="btn-retake">Retake</button>
+          </div>
+          <p class="fine" id="units-note"></p>
+        </div>
+        <div id="loading" role="status" aria-live="polite" hidden>
+          <h2 id="loading-title">Analyzing your skin…</h2>
+          <p class="muted" id="loading-sub">Uploading securely to YouCam AI</p>
+          <div class="bar-loader" aria-hidden="true"><i></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2. REPORT ============ -->
+    <section id="view-results" class="view" aria-labelledby="summary-title" hidden>
+      <div class="needs-scan card" id="results-empty">No scan yet. Your skin report shows up here. <button class="btn primary sm" data-go="scan">Start a scan</button></div>
+      <div id="results" hidden>
+        <div class="report-hero card">
+          <div class="ring" id="ring" role="img" aria-label="Skin score"><span id="overall">--</span><small>skin score</small></div>
+          <div class="report-head">
+            <span class="balance" id="balance"></span>
+            <h2 id="summary-title" tabindex="-1">Your skin today</h2>
+            <p id="summary-sub" class="muted"></p>
+            <div class="tags"><span class="tag" id="sample-tag" hidden>Sample data, not your photo</span><span class="tag live" id="live-tag" hidden>✓ Live YouCam AI analysis</span><span class="tag" id="type-tag"></span></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card photo-card">
+            <h3>Where we found it</h3>
+            <div class="photo" id="photo">
+              <img id="photo-img" alt="Your analyzed photo" />
+              <img id="photo-mask" alt="" aria-hidden="true" />
+            </div>
+            <div class="mask-chips" id="mask-chips" role="group" aria-label="Show detection areas"></div>
+            <p class="fine" id="mask-hint"></p>
+          </div>
+          <div class="card">
+            <h3>Full analysis</h3>
+            <div id="groups"></div>
+            <p class="fine">Scores 0 to 100, higher is healthier. <span class="legend"><i class="sym attention" aria-hidden="true">!</i> Needs attention <i class="sym watch" aria-hidden="true">~</i> Watch <i class="sym good" aria-hidden="true">✓</i> Good</span></p>
+          </div>
+        </div>
+
+        <div class="card" id="shade-card">
+          <h2>Find your foundation shade</h2>
+          <p class="muted">YouCam's Facial Color Tones Analyzer reads your exact skin colour. We match it to foundation shades, and you can try each one on your own photo.</p>
+          <div class="actions tight"><button class="btn primary" id="btn-tone">🎨 Match my shade</button></div>
+          <p class="fine" id="tone-note"></p>
+          <div id="shade-out"></div>
+        </div>
+
+        <div class="card">
+          <h2>Your skin shopping list</h2>
+          <p class="muted">Based on your three lowest scores. Look for these on the label, and skip the rest of the hype.</p>
+          <div class="shop" id="shop"></div>
+        </div>
+        <div class="next-cta">
+          <button class="btn primary xl" data-go="decide">Should I buy it? →</button>
+          <button class="btn ghost" id="btn-rescan">Rescan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2. DECIDE ============ -->
+    <section id="view-decide" class="view" aria-labelledby="decide-h" hidden>
+      <div class="needs-scan card" hidden>Scan your skin first. The verdict depends on your results. <button class="btn primary sm" data-go="scan">Go to scan</button></div>
+      <div class="grid-2 decide">
+        <div class="card">
+          <h2 id="decide-h" tabindex="-1">Should I buy this?</h2>
+          <p class="muted">Scan or type a barcode, pick a sample, or paste the ingredient list from any product page or pack.</p>
+
+          <div class="barcode-row">
+            <label class="field grow">Barcode
+              <input id="barcode" inputmode="numeric" pattern="[0-9]*" maxlength="14" placeholder="e.g. 8901234567890" autocomplete="off" />
+            </label>
+            <button class="btn ghost" id="btn-lookup">Look up</button>
+            <button class="btn ghost" id="btn-scan-barcode" hidden>▥ Scan</button>
+            <button class="btn ghost" id="btn-ocr">📷 Read label</button>
+          </div>
+          <input type="file" id="ocr-file" accept="image/*" capture="environment" hidden aria-hidden="true" tabindex="-1" />
+          <p class="fine" id="ocr-status" role="status" aria-live="polite"></p>
+          <div class="barcode-cam" id="barcode-cam" hidden>
+            <video id="barcode-video" playsinline muted aria-label="Barcode camera"></video>
+            <button class="btn ghost light sm" id="btn-barcode-stop">Stop</button>
+          </div>
+
+          <div class="samples" id="samples" role="group" aria-label="Sample products"></div>
+          <label class="field">Product name
+            <input id="p-name" maxlength="120" placeholder="e.g. Vitamin C serum I saw on sale" />
+          </label>
+          <label class="field">Ingredients
+            <textarea id="p-ing" rows="7" maxlength="6000" placeholder="Aqua, Niacinamide, Glycerin, Zinc PCA, …"></textarea>
+          </label>
+          <button class="btn primary" id="btn-check">Get my verdict</button>
+        </div>
+        <div class="card verdict-card" id="verdict" aria-live="polite" hidden></div>
+        <div class="card empty" id="verdict-empty">
+          <div class="empty-ill" aria-hidden="true">?</div>
+          <p>Your verdict appears here. It weighs each active ingredient against <b>your</b> scan, flags ingredients that clash with your weak spots, and tells you what the product won't fix.</p>
+          <p class="fine">Database: <span id="db-size"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. TRACK ============ -->
+    <section id="view-track" class="view" aria-labelledby="track-h" hidden>
+      <div class="card">
+        <h2 id="track-h" tabindex="-1">Is it working?</h2>
+        <p class="muted">Every product you track is compared against the scan you took before you started. Rescan every 2 to 4 weeks in the same light, and SkinVerdict checks only the concerns that product is supposed to fix.</p>
+        <div id="trials"></div>
+      </div>
+
+      <div class="card" id="reminder-card">
+        <h2>Rescan reminders</h2>
+        <p class="muted">Add your rescan dates to your phone's calendar, or let SkinVerdict nudge you when you open it.</p>
+        <div class="actions tight"><button class="btn ghost sm" id="btn-notify">🔔 Allow reminders</button></div>
+        <p class="fine" id="due-list"></p>
+      </div>
+
+      <div class="card">
+        <h2>Your skin over time</h2>
+        <div id="chart" class="chart"></div>
+        <div class="compare" id="compare"></div>
+      </div>
+
+      <div class="card" id="history-card">
+        <h2>Scan history</h2>
+        <div id="history"></div>
+        <div class="actions">
+          <button class="btn ghost sm" id="btn-export">Download backup</button>
+          <button class="btn ghost sm" id="btn-import">Restore backup</button>
+          <input type="file" id="import-file" accept="application/json,.json" hidden aria-hidden="true" tabindex="-1" />
+          <button class="btn ghost sm danger" id="btn-clear">Clear all data</button>
+        </div>
+        <p class="fine">Your data stays on this device. Download a backup to keep it safe or move it to another phone.</p>
+      </div>
+
+      <div class="card" id="sync-card">
+        <h2>Sync across devices</h2>
+        <p class="muted">End-to-end encrypted: your sync code is the only key, and our server can't read your data. Keep the code private, like a password.</p>
+        <div id="sync-on" hidden>
+          <label class="field">Your sync code<input id="sync-code" readonly /></label>
+          <div class="actions tight"><button class="btn ghost sm" id="btn-copy-code">Copy code</button><button class="btn ghost sm" id="btn-sync-now">Sync now</button><button class="btn ghost sm danger" id="btn-sync-off">Turn off on this device</button></div>
+          <p class="fine" id="sync-status" role="status" aria-live="polite"></p>
+        </div>
+        <div id="sync-off">
+          <div class="actions tight"><button class="btn primary sm" id="btn-sync-start">Turn on sync</button></div>
+          <label class="field">Already have a code? Paste it to restore here<input id="sync-input" autocomplete="off" spellcheck="false" placeholder="e.g. 3f2a…-K7Q…" /></label>
+          <button class="btn ghost sm" id="btn-sync-restore">Restore from code</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      Skin analysis powered by the <b>YouCam AI Skin Analysis API</b> (Perfect Corp.). Barcode data from Open Beauty Facts. SkinVerdict provides cosmetic guidance, not medical advice. See a dermatologist for persistent or severe concerns.
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <canvas id="canvas" hidden></canvas>
+  <script src="js/ingredients.js?v=5"></script>
+  <script src="js/engine.js?v=5"></script>
+  <script src="js/products.js?v=5"></script>
+  <script src="js/store.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
+</body>
+</html>
